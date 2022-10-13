@@ -1,0 +1,9 @@
+statements/
+data/
+log/
+
+__pycache__/*
+.DS_Store  
+
+
+
