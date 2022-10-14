@@ -3,7 +3,7 @@ import os
 import torch
 import logging
 
-from Net import Net
+from net import Net
 
 logger = logging.getLogger(__name__)
 # log to console

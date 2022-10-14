@@ -3,7 +3,81 @@ import re
 import readline
 import pandas as pd
 import pickle
+from dataclasses import dataclass
+
 from log import logger
+
+@dataclass
+class LabelData:
+    """LabelData class
+    """
+    X: pd.Series
+    y: pd.Series
+
+
+@dataclass
+class OneHotData:
+    """OneHotData class
+    """
+    X_keys: pd.Series
+    y_keys: pd.Series
+    X: pd.DataFrame
+    y: pd.DataFrame
+
+
+def classify_data(data: list[str]) -> LabelData:
+    """classify_data function
+    """
+    X = pd.Series(data)
+    y = pd.Series(['']*len(X))
+    y_unique = []
+
+    # set up auto complete
+    def complete(text,state):
+        volcab = y_unique
+        results = [x for x in volcab if x.lower().startswith(text.lower())] + [None]
+        return results[state]
+    readline.parse_and_bind("tab: complete")
+    readline.set_completer(complete)
+
+    # classify data
+    for index, entry in enumerate(X):
+        # prompt the user for a class name
+        class_name = input(f'Classify "{entry}" as: ')
+        if class_name == '':
+            class_name = 'Other'
+        if class_name == 'q':
+            break
+        y[index] = class_name
+
+        # add the class name to the list of class names
+        if class_name not in y_unique:
+            y_unique(class_name)
+
+    return LabelData(X, y)
+
+def data_to_one_hot(data: LabelData) -> OneHotData:
+    """data_to_one_hot function
+    """
+    freq_map = {}
+    for line in data.X:
+        words = re.split(' |/|-', line)
+        for word in words:
+            if word in freq_map and not word.isnumeric():
+                freq_map[word] += 1
+            else:
+                freq_map[word] = 1
+
+    # remove words that only appear once
+    freq_map = {k: v for k, v in freq_map.items() if v > 1}
+
+    X_keys = pd.Series(list(freq_map.keys()))
+    y_keys = pd.Series(data.y.unique())
+
+    X = data.X.apply(lambda x: [1 if word in re.split(' |/|-', x) else 0 for word in X_keys])
+    y = data.y.apply(lambda x: [1 if word == x else 0 for word in y_keys])
+
+    return OneHotData(X_keys, y_keys, X, y)
 
 class ModelData:
     def __init__(self, raw_data: pd.DataFrame = None, data_path: str = None, meta_path: str = None):

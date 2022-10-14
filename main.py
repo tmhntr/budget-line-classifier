@@ -1,8 +1,8 @@
 import pandas as pd
 import torch
 
-from Data import ModelData
-from Model import Model
+from data import ModelData
+from model import Model
 
 def main():
     # load the data
