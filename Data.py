@@ -52,7 +52,7 @@ def classify_data(data: list[str]) -> LabelData:
 
         # add the class name to the list of class names
         if class_name not in y_unique:
-            y_unique(class_name)
+            y_unique.append(class_name)
 
     return LabelData(X, y)
 
@@ -74,8 +74,8 @@ def data_to_one_hot(data: LabelData) -> OneHotData:
     X_keys = pd.Series(list(freq_map.keys()))
     y_keys = pd.Series(data.y.unique())
 
-    X = data.X.apply(lambda x: [1 if word in re.split(' |/|-', x) else 0 for word in X_keys])
-    y = data.y.apply(lambda x: [1 if word == x else 0 for word in y_keys])
+    X = data.X.apply(lambda x: pd.Series([1 if word in re.split(' |/|-', x) else 0 for word in X_keys]))
+    y = data.y.apply(lambda x: pd.Series([1 if word == x else 0 for word in y_keys]))
 
     return OneHotData(X_keys, y_keys, X, y)
 
