@@ -34,8 +34,8 @@ def classify_data(data: list[str]) -> LabelData:
 
     # set up auto complete
     def complete(text,state):
-        volcab = y_unique
-        results = [x for x in volcab if x.lower().startswith(text.lower())] + [None]
+        vocab = y_unique
+        results = [x for x in vocab if x.lower().startswith(text.lower())] + [None]
         return results[state]
     readline.parse_and_bind("tab: complete")
     readline.set_completer(complete)
